@@ -16,18 +16,18 @@ const argv = yargs
 
 // Load environment variables.
 dotenv.config();
-const { NODE_URL, INFURA_KEY, MNEMONIC, ETHERSCAN_API_KEY, PK, SOLIDITY_VERSION, SOLIDITY_SETTINGS } = process.env;
+const { NODE_URL, INFURA_KEY, MNEMONIC, ETHERSCAN_API_KEY, PRIVATE_KEY, SOLIDITY_VERSION, SOLIDITY_SETTINGS } = process.env;
 
 const DEFAULT_MNEMONIC = "candy maple cake sugar pudding cream honey rich smooth crumble sweet treat";
 
-const sharedNetworkConfig: HttpNetworkUserConfig = {};
-if (PK) {
-    sharedNetworkConfig.accounts = [PK];
-} else {
-    sharedNetworkConfig.accounts = {
-        mnemonic: MNEMONIC || DEFAULT_MNEMONIC,
-    };
-}
+// const sharedNetworkConfig: HttpNetworkUserConfig = {};
+// if (PRIVATE_KEY) {
+//     sharedNetworkConfig.accounts = [PRIVATE_KEY];
+// } else {
+//     sharedNetworkConfig.accounts = {
+//         mnemonic: MNEMONIC || DEFAULT_MNEMONIC,
+//     };
+// }
 
 if (["mainnet", "rinkeby", "kovan", "goerli", "ropsten", "mumbai", "polygon"].includes(argv.network) && INFURA_KEY === undefined) {
     throw new Error(`Could not find Infura key in env, unable to connect to network ${argv.network}`);
@@ -60,6 +60,7 @@ const deterministicDeployment = (network: string): DeterministicDeploymentInfo =
 };
 
 const userConfig: HardhatUserConfig = {
+    defaultNetwork: "bscTestnet",
     paths: {
         artifacts: "build/artifacts",
         cache: "build/cache",
@@ -79,42 +80,53 @@ const userConfig: HardhatUserConfig = {
             blockGasLimit: 100000000,
             gas: 100000000,
         },
-        mainnet: {
-            ...sharedNetworkConfig,
-            url: `https://mainnet.infura.io/v3/${INFURA_KEY}`,
+        // mainnet: {
+        //     ...sharedNetworkConfig,
+        //     url: `https://mainnet.infura.io/v3/${INFURA_KEY}`,
+        // },
+        // gnosis: {
+        //     ...sharedNetworkConfig,
+        //     url: "https://rpc.gnosischain.com",
+        // },
+        // goerli: {
+        //     ...sharedNetworkConfig,
+        //     url: `https://goerli.infura.io/v3/${INFURA_KEY}`,
+        // },
+        // mumbai: {
+        //     ...sharedNetworkConfig,
+        //     url: `https://polygon-mumbai.infura.io/v3/${INFURA_KEY}`,
+        // },
+        // polygon: {
+        //     ...sharedNetworkConfig,
+        //     url: `https://polygon-mainnet.infura.io/v3/${INFURA_KEY}`,
+        // },
+        // bsc: {
+        //     ...sharedNetworkConfig,
+        //     url: `https://bsc-dataseed.binance.org/`,
+        // },
+        bscTestnet: {
+            url: "https://bsc-testnet.publicnode.com",
+            chainId: 97,
+            gasPrice: 4e9,
+            gas: 2e7,
+            // gas: 1e7,
+            // accounts: [`0x${PRIVATE_KEY}`],
+            accounts: [
+                `0x${PRIVATE_KEY}`,
+            ]
         },
-        gnosis: {
-            ...sharedNetworkConfig,
-            url: "https://rpc.gnosischain.com",
-        },
-        goerli: {
-            ...sharedNetworkConfig,
-            url: `https://goerli.infura.io/v3/${INFURA_KEY}`,
-        },
-        mumbai: {
-            ...sharedNetworkConfig,
-            url: `https://polygon-mumbai.infura.io/v3/${INFURA_KEY}`,
-        },
-        polygon: {
-            ...sharedNetworkConfig,
-            url: `https://polygon-mainnet.infura.io/v3/${INFURA_KEY}`,
-        },
-        bsc: {
-            ...sharedNetworkConfig,
-            url: `https://bsc-dataseed.binance.org/`,
-        },
-        arbitrum: {
-            ...sharedNetworkConfig,
-            url: `https://arb1.arbitrum.io/rpc`,
-        },
-        fantomTestnet: {
-            ...sharedNetworkConfig,
-            url: `https://rpc.testnet.fantom.network/`,
-        },
-        avalanche: {
-            ...sharedNetworkConfig,
-            url: `https://api.avax.network/ext/bc/C/rpc`,
-        },
+        // arbitrum: {
+        //     ...sharedNetworkConfig,
+        //     url: `https://arb1.arbitrum.io/rpc`,
+        // },
+        // fantomTestnet: {
+        //     ...sharedNetworkConfig,
+        //     url: `https://rpc.testnet.fantom.network/`,
+        // },
+        // avalanche: {
+        //     ...sharedNetworkConfig,
+        //     url: `https://api.avax.network/ext/bc/C/rpc`,
+        // },
     },
     deterministicDeployment,
     namedAccounts: {
@@ -127,10 +139,10 @@ const userConfig: HardhatUserConfig = {
         apiKey: ETHERSCAN_API_KEY,
     },
 };
-if (NODE_URL) {
-    userConfig.networks!.custom = {
-        ...sharedNetworkConfig,
-        url: NODE_URL,
-    };
-}
+// if (NODE_URL) {
+//     userConfig.networks!.custom = {
+//         ...sharedNetworkConfig,
+//         url: NODE_URL,
+//     };
+// }
 export default userConfig;
